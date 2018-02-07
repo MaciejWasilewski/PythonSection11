@@ -6,6 +6,8 @@ def parabola(par_x):
     return list(map(lambda x: (x ** 2) / 100, par_x))
 
 
+def plot_circle(par_canvas, par_r, par_x, par_y, colour="red"):
+    par_canvas.create_oval(par_x + par_r, par_y + par_r, par_x - par_r, par_y - par_r, outline=colour, width=2)
 
 
 def circle(par_r, par_x, par_y, points=360):
@@ -63,4 +65,5 @@ for i in range(3, 30, 1):
     x, y = circle(100, 200, 0, points=i)
     plot(canvas, x, y)
 plot(canvas, X2, list(map(lambda x: x / 2, parabola(X2))))
+plot_circle(canvas, 100, 100, 100, "blue")
 mainWindow.mainloop()
