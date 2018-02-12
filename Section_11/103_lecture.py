@@ -41,10 +41,13 @@ def score_hand(hand):
 
 
 def deal_dealer():
-    dealer_hand.append(deal_card(dealer_card_frame))
     dealer_score = score_hand(dealer_hand)
+    while 0 < dealer_score < 17:
+        dealer_hand.append(deal_card(dealer_card_frame))
+        dealer_score = score_hand(dealer_hand)
+        dealer_score_label.set(dealer_score)
+
     player_score = score_hand(player_hand)
-    dealer_score_label.set(dealer_score)
     if player_score > 21:
         result_text.set("Dealer wins!")
     elif dealer_score > 21 or dealer_score < player_score:
@@ -62,6 +65,26 @@ def deal_player():
     player_score_label.set(player_score)
     if player_score > 21:
         result_text.set("Dealer wins!")
+
+
+def reset_game():
+    global deck, cards, dealer_card_frame, player_card_frame, dealer_hand, player_hand
+    deck = list(cards)
+    random.shuffle(deck)
+    dealer_hand = []
+    player_hand = []
+    del dealer_card_frame
+    del player_card_frame
+    dealer_card_frame = tkinter.Frame(card_frame, background="green")
+    dealer_card_frame.grid(row=0, column=1, sticky='ew', rowspan=2)
+    player_card_frame = tkinter.Frame(card_frame, background="green")
+    player_card_frame.grid(row=2, column=1, sticky='ew', rowspan=2)
+    result_text.set("")
+    dealer_score_label.set(0)
+    deal_player()
+    dealer_hand.append(deal_card(dealer_card_frame))
+    dealer_score_label.set(score_hand(dealer_hand))
+    deal_player()
 
 
 mainWindow = tkinter.Tk()
@@ -102,15 +125,26 @@ dealer_button.grid(row=0, column=0)
 player_button = tkinter.Button(button_frame, text="Player", command=deal_player)
 player_button.grid(row=0, column=1)
 
+reset_button = tkinter.Button(button_frame, text="New Game", command=reset_game)
+reset_button.grid(row=0, column=2)
+
 cards = []
-load_images(cards)
-
-deck = list(cards)
-random.shuffle(deck)
-
-dealer_hand = []
-player_hand = []
-
-deal_player()
-dealer_hand
+cards2 = []
+load_images(cards2)
+# print(len(cards2))
+for i in range(0, 10):
+    cards.extend(cards2)
+deck = []
+# deck = list(cards)
+# random.shuffle(deck)
+#
+# player_hand = []
+# dealer_hand = []
+#
+# deal_player()
+# dealer_hand.append(deal_card(dealer_card_frame))
+# dealer_score_label.set(score_hand(dealer_hand))
+# deal_player()
+reset_game()
+# print(len(deck))
 mainWindow.mainloop()
