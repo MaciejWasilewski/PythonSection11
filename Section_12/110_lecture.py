@@ -1,4 +1,6 @@
 class Kettle(object):
+    power_source = "electricity"
+
     def __init__(self, make, price):
         self.make = make
         self.price = price
@@ -22,3 +24,9 @@ print(kenwood.on)
 
 Kettle.switch_on(kenwood)
 print(kenwood.on)
+
+print(Kettle.power_source)
+print(kenwood.power_source)
+
+print(Kettle.__dict__)
+print(kenwood.__dict__)
