@@ -85,8 +85,46 @@ def load_data():
         for line in albums:
             artist_field, album_field, year_field, song_field = tuple(line.strip('\n').split('\t'))
             year_field = int(year_field)
-            print(artist_field, album_field, year_field, song_field)
+            print("{}:{}:{}:{}".format(artist_field, album_field, year_field, song_field))
+
+            if new_artist is None:
+                new_artist = Artist(artist_field)
+            elif new_artist.name != artist_field:
+                new_artist.add_album(new_album)
+                artist_list.append(new_artist)
+                new_artist = Artist(artist_field)
+                new_album = None
+            if new_album is None:
+                new_album = Album(album_field, year_field, new_artist)
+            elif new_album.album_name != album_field:
+                new_artist.add_album(new_album)
+                new_album = Album(album_field, year_field, new_artist)
+
+            new_song = Song(song_field, new_artist)
+            new_album.add_song(new_song)
+
+        if new_artist is not None:
+            if new_album is not None:
+                new_artist.add_album(new_album)
+            artist_list.append(new_artist)
+    return artist_list
+
+
+def create_checkfile(par_artist_list):
+    with open("checkfile.txt", "w") as checkfile:
+        for artist in par_artist_list:
+            for album in artist.albums:
+                for song in album.tracks:
+                    print("{0.name}\t{1.album_name}\t{1.year}\t{2.title}".format(artist, album, song), file=checkfile)
 
 
 if __name__ == "__main__":
-    load_data()
+    artist_list = load_data()
+    for i in range(len(artist_list)):
+        print("{0:2}. {1}".format(i + 1, artist_list[i].name))
+        for j in range(len(artist_list[i].albums)):
+            print("-" * 3 + "{0:2}. {1}".format(j + 1, artist_list[i].albums[j].album_name))
+            for song in artist_list[i].albums[j].tracks:
+                print("-" * 6 + song.title)
+    print("There are {} artist".format(len(artist_list)))
+    create_checkfile(artist_list)
