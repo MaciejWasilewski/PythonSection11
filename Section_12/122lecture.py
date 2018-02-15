@@ -3,17 +3,20 @@
 
 class Song:
     """Class to represent a song
-    
+
     Attributes:
         title (str): The title of the song
-        artist (Artist): An artist object representing the songs creator
         duration (int) The duration of the song in seconds. May be zero.
         """
 
-    def __init__(self, title, artist, duration=0):
+    def __init__(self, title, duration=0):
         self.title = title
-        self.artist = artist
         self.duration = duration
+
+    def get_title(self):
+        return self.title
+
+    name = property(get_title)
 
 
 class Album:
@@ -23,7 +26,6 @@ class Album:
     Attributes:
         album_name (str): The name of the album.
         year (int): The year of release.
-        artist: (Artist): The artist responsible for album. If not specified, the artist will default to an artist with
         the name 'Various Artist'
         tracks (List[Song]): A list of the songs on the album.
 
@@ -31,23 +33,20 @@ class Album:
         add_song: Used to add a new song to the album's tracklist.
     """
 
-    def __init__(self, name, year, artist=None):
+    def __init__(self, name, year):
         self.album_name = name
         self.year = year
-        if artist is None:
-            self.artist = Artist("Various Artists")
-        else:
-            self.artist = artist
         self.tracks = []
 
-    def add_song(self, song, position=None):
+    def add_song(self, song_name, position=None):
         """Adds a song to the track list
 
-        :param song: A song to add
+        :param song_name: A song to add
         :param position: If specified, the song will be added to that position in the track list
         - inserting it between other songs if necessary.
         Otherwise, the song will be added to the end of the list
         """
+        song=Song(song_name)
         if position is None:
             self.tracks.append(song)
         else:
@@ -79,6 +78,16 @@ class Artist:
         """
         self.albums.append(album)
 
+    def add_song(self, par_album_field, par_year_field, par_song_field):
+        albums_names_list = [x.album_name for x in self.albums]
+        if par_album_field not in albums_names_list:
+            temp_album = Album(par_album_field, par_year_field)
+            self.add_album(temp_album)
+            # album_pos = len(par_artist_list[artist_pos].albums) - 1
+        else:
+            temp_album = self.albums[albums_names_list.index(par_album_field)]
+        temp_album.add_song(par_song_field)
+
 
 def load_data2():
     with open("albums.txt", "r") as albums:
@@ -94,17 +103,17 @@ def load_data2():
             else:
                 temp_artist = par_artist_list[artist_names_list.index(artist_field)]
                 # artist_pos =
-
-            albums_names_list = [x.album_name for x in temp_artist.albums]
-            if album_field not in albums_names_list:
-                temp_album = Album(album_field, year_field, temp_artist)
-                temp_artist.add_album(temp_album)
-                # album_pos = len(par_artist_list[artist_pos].albums) - 1
-            else:
-                temp_album = temp_artist.albums[albums_names_list.index(album_field)]
-                # album_pos = albums_names_list.index(album_field)
-
-            temp_album.add_song(Song(song_field, temp_album))
+            temp_artist.add_song(album_field, year_field, song_field)
+            # albums_names_list = [x.album_name for x in temp_artist.albums]
+            # if album_field not in albums_names_list:
+            #     temp_album = Album(album_field, year_field, temp_artist)
+            #     temp_artist.add_album(temp_album)
+            #     # album_pos = len(par_artist_list[artist_pos].albums) - 1
+            # else:
+            #     temp_album = temp_artist.albums[albums_names_list.index(album_field)]
+            #     # album_pos = albums_names_list.index(album_field)
+            #
+            # temp_album.add_song(Song(song_field, temp_album))
         return par_artist_list
 
 
@@ -126,12 +135,12 @@ def load_data():
                 new_artist = Artist(artist_field)
                 new_album = None
             if new_album is None:
-                new_album = Album(album_field, year_field, new_artist)
+                new_album = Album(album_field, year_field)
             elif new_album.album_name != album_field:
                 new_artist.add_album(new_album)
-                new_album = Album(album_field, year_field, new_artist)
+                new_album = Album(album_field, year_field)
 
-            new_song = Song(song_field, new_artist)
+            new_song = Song(song_field)
             new_album.add_song(new_song)
 
         if new_artist is not None:
@@ -150,10 +159,8 @@ def create_checkfile(par_artist_list):
 
 
 if __name__ == "__main__":
-    # start = time()
-    # for i in range(1):
     artist_list = load_data2()
-    # print((time() - start) / 1)
+
     # start = time.time()
 
     # artist_list = load_data2()
@@ -165,4 +172,6 @@ if __name__ == "__main__":
     #         for k in range(len(artist_list[i].albums[j].tracks)):
     #             print("-" * 8 + "{0:2}. {1}".format(k + 1, artist_list[i].albums[j].tracks[k].title))
     print("There are {} artist".format(len(artist_list)))
+    print(artist_list[2].name)
+    print(artist_list[2].albums[1].tracks[1].name)
     create_checkfile(artist_list)
